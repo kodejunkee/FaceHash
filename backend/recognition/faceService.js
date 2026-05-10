@@ -23,7 +23,7 @@ const path = require('path');
 
 // Configure WASM paths before initialization
 // This points to the pre-compiled WebAssembly binaries installed by npm
-wasm.setWasmPaths(`https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${wasm.version_wasm}/dist/`);
+wasm.setWasmPaths(path.join(__dirname, '../node_modules/@tensorflow/tfjs-backend-wasm/dist/'));
 
 // Patch face-api.js to work in Node.js environment
 // @napi-rs/canvas provides Canvas and Image implementations

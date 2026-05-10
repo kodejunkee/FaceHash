@@ -26,15 +26,15 @@ export default function App() {
         initialRouteName="Login"
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#0a0a1a',
+            backgroundColor: '#000000',
           },
-          headerTintColor: '#ffffff',
+          headerTintColor: '#FFFFFF',
           headerTitleStyle: {
             fontWeight: '700',
           },
           headerShadowVisible: false,
           contentStyle: {
-            backgroundColor: '#0a0a1a',
+            backgroundColor: '#000000',
           },
         }}
       >
@@ -52,7 +52,7 @@ export default function App() {
           name="Dashboard"
           component={DashboardScreen}
           options={{
-            title: 'Dashboard',
+            headerShown: false,
             headerLeft: () => null, // Prevent back navigation
           }}
         />

@@ -2,11 +2,7 @@
  * Dashboard Screen
  * 
  * Displayed after successful authentication.
- * Shows:
- * - Authenticated user information
- * - Face match distance score (for academic demonstration)
- * - List of all registered users
- * - API health status
+ * Completely overhauled Layout: Control Center / Widget Dashboard.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +15,9 @@ import {
   ActivityIndicator,
   RefreshControl,
   Platform,
+  StatusBar,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getUsers, healthCheck } from '../services/api';
 
 export default function DashboardScreen({ route, navigation }) {
@@ -62,312 +60,393 @@ export default function DashboardScreen({ route, navigation }) {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00d4ff" />
-      }
-    >
-      {/* Success Header */}
-      <View style={styles.successHeader}>
-        <Text style={styles.checkIcon}>✅</Text>
-        <Text style={styles.successTitle}>Authentication Successful</Text>
-        <Text style={styles.successSubtitle}>
-          Identity verified using facial biometrics
-        </Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+
+      {/* Top Navigation Bar */}
+      <View style={styles.navBar}>
+        <View style={styles.avatarBox}>
+          <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+        </View>
+        <TouchableOpacity style={styles.logoutBtnIcon} onPress={handleLogout} activeOpacity={0.7}>
+          <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
-      {/* User Info Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>👤 Authenticated User</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Name</Text>
-          <Text style={styles.infoValue}>{user.name}</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFFFFF" />
+        }
+      >
+        {/* Hero Section */}
+        <View style={styles.heroSection}>
+          <View style={styles.verifiedBadge}>
+            <Ionicons name="checkmark-circle" size={14} color="#000000" />
+            <Text style={styles.verifiedText}>AUTHENTICATED</Text>
+          </View>
+          <Text style={styles.heroGreeting}>Hello, {user.name.split(' ')[0]}</Text>
+          <Text style={styles.heroSub}>Identity verified via facial biometrics</Text>
         </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Email</Text>
-          <Text style={styles.infoValue}>{user.email}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>User ID</Text>
-          <Text style={styles.infoValueSmall}>{user.id}</Text>
-        </View>
-      </View>
 
-      {/* Biometric Match Details (Academic Demo) */}
-      {comparison && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>🔬 Biometric Match Details</Text>
-          <Text style={styles.cardDescription}>
-            Euclidean distance between face embeddings
-          </Text>
-          <View style={styles.metricRow}>
-            <View style={styles.metric}>
-              <Text style={styles.metricValue}>{comparison.distance}</Text>
-              <Text style={styles.metricLabel}>Distance</Text>
+        {/* Biometric Analysis Hero Widget */}
+        {comparison && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Match Diagnostics</Text>
+            <View style={styles.card}>
+              <View style={styles.resultHeader}>
+                <Ionicons
+                  name={comparison.match ? "shield-checkmark" : "warning"}
+                  size={36}
+                  color={comparison.match ? "#FFFFFF" : "#EF4444"}
+                />
+                <View style={styles.resultTextContainer}>
+                  <Text style={[styles.resultMainText, !comparison.match && styles.errorText]}>
+                    {comparison.match ? 'MATCH CONFIRMED' : 'MATCH FAILED'}
+                  </Text>
+                  <Text style={styles.resultSubText}>Based on Euclidean distance</Text>
+                </View>
+              </View>
+
+              <View style={styles.statsRow}>
+                <View style={styles.statBox}>
+                  <Text style={styles.statLabel}>DISTANCE</Text>
+                  <Text style={styles.statValue}>{comparison.distance}</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statBox}>
+                  <Text style={styles.statLabel}>THRESHOLD</Text>
+                  <Text style={styles.statValue}>{comparison.threshold}</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.metric}>
-              <Text style={styles.metricValue}>{comparison.threshold}</Text>
-              <Text style={styles.metricLabel}>Threshold</Text>
-            </View>
-            <View style={styles.metric}>
-              <Text style={[styles.metricValue, styles.matchText]}>
-                {comparison.match ? 'MATCH' : 'NO MATCH'}
+            <View style={styles.tooltipBox}>
+              <Ionicons name="information-circle-outline" size={14} color="#71717A" style={styles.tooltipIcon} />
+              <Text style={styles.tooltipText}>
+                A distance below the threshold indicates the same person. Lower distance = higher similarity.
               </Text>
-              <Text style={styles.metricLabel}>Result</Text>
             </View>
           </View>
-          <View style={styles.explanationBox}>
-            <Text style={styles.explanationText}>
-              A distance below the threshold indicates the same person.
-              Lower distance = higher similarity.
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {/* Security Info Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>🔒 Security Information</Text>
-        <View style={styles.securityRow}>
-          <Text style={styles.securityDot}>●</Text>
-          <Text style={styles.securityText}>Biometric template encrypted with AES-256-CBC</Text>
-        </View>
-        <View style={styles.securityRow}>
-          <Text style={styles.securityDot}>●</Text>
-          <Text style={styles.securityText}>No raw face images stored in database</Text>
-        </View>
-        <View style={styles.securityRow}>
-          <Text style={styles.securityDot}>●</Text>
-          <Text style={styles.securityText}>Encryption key stored in environment variables</Text>
-        </View>
-        <View style={styles.securityRow}>
-          <Text style={styles.securityDot}>●</Text>
-          <Text style={styles.securityText}>Random IV generated for each encryption</Text>
-        </View>
-      </View>
-
-      {/* Registered Users */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>
-          👥 Registered Users ({users.length})
-        </Text>
-        {isLoading ? (
-          <ActivityIndicator size="small" color="#00d4ff" />
-        ) : users.length === 0 ? (
-          <Text style={styles.emptyText}>No users registered yet</Text>
-        ) : (
-          users.map((u, index) => (
-            <View key={u.id} style={styles.userRow}>
-              <View style={styles.userAvatar}>
-                <Text style={styles.userAvatarText}>
-                  {u.name.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-              <View style={styles.userInfo}>
-                <Text style={styles.userName}>{u.name}</Text>
-                <Text style={styles.userEmail}>{u.email}</Text>
-              </View>
-            </View>
-          ))
         )}
-      </View>
 
-      {/* API Status */}
-      {apiStatus && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>⚡ API Status</Text>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Status</Text>
-            <Text style={[styles.infoValue, styles.statusOk]}>
-              {apiStatus.status?.toUpperCase()}
-            </Text>
+        {/* Security Audit Log - 2x2 Grid */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Security Protocol</Text>
+          <View style={styles.securityGrid}>
+            <View style={styles.securityWidget}>
+              <Ionicons name="lock-closed" size={24} color="#FFFFFF" style={styles.widgetIcon} />
+              <Text style={styles.widgetText}>AES-256 Encryption</Text>
+            </View>
+            <View style={styles.securityWidget}>
+              <Ionicons name="eye-off" size={24} color="#FFFFFF" style={styles.widgetIcon} />
+              <Text style={styles.widgetText}>No raw images stored</Text>
+            </View>
+            <View style={styles.securityWidget}>
+              <MaterialCommunityIcons name="shield-lock-outline" size={24} color="#FFFFFF" style={styles.widgetIcon} />
+              <Text style={styles.widgetText}>Env Key Storage</Text>
+            </View>
+            <View style={styles.securityWidget}>
+              <MaterialCommunityIcons name="shield-key" size={24} color="#FFFFFF" style={styles.widgetIcon} />
+              <Text style={styles.widgetText}>Randomized IVs</Text>
+            </View>
           </View>
         </View>
-      )}
 
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        {/* Network Access - Horizontal Carousel */}
+        <View style={styles.carouselSection}>
+          <View style={[styles.sectionHeaderRow, { paddingHorizontal: 24 }]}>
+            <Text style={styles.sectionTitle}>Network ({users.length})</Text>
+            {apiStatus && (
+              <View style={styles.statusBadge}>
+                <View style={styles.statusDot} />
+                <Text style={styles.statusText}>{apiStatus.status?.toUpperCase()}</Text>
+              </View>
+            )}
+          </View>
+
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" style={{ padding: 20 }} />
+          ) : users.length === 0 ? (
+            <Text style={styles.emptyText}>No users registered yet</Text>
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.usersCarousel}
+            >
+              {users.map((u) => (
+                <View key={u.id} style={styles.userCard}>
+                  <View style={styles.userInitialsBox}>
+                    <Text style={styles.userInitialsText}>{u.name.charAt(0).toUpperCase()}</Text>
+                  </View>
+                  <Text style={styles.userName} numberOfLines={1}>{u.name}</Text>
+                  <Text style={styles.userEmail} numberOfLines={1}>{u.email}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#000000',
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 40,
-  },
-  successHeader: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  checkIcon: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#ffffff',
-    marginBottom: 6,
-  },
-  successSubtitle: {
-    fontSize: 15,
-    color: '#888',
-  },
-  card: {
-    backgroundColor: '#12122a',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#1e1e3a',
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 12,
-  },
-  cardDescription: {
-    fontSize: 13,
-    color: '#888',
-    marginBottom: 16,
-  },
-  infoRow: {
+  navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1e1e3a',
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'ios' ? 76 : 56,
+    paddingBottom: 20,
   },
-  infoLabel: {
-    fontSize: 14,
-    color: '#888',
-  },
-  infoValue: {
-    fontSize: 14,
-    color: '#ffffff',
-    fontWeight: '600',
-  },
-  infoValueSmall: {
-    fontSize: 11,
-    color: '#888',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    maxWidth: '60%',
-  },
-  metricRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
-  },
-  metric: {
-    alignItems: 'center',
-  },
-  metricValue: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#00d4ff',
-    marginBottom: 4,
-  },
-  metricLabel: {
-    fontSize: 12,
-    color: '#888',
-  },
-  matchText: {
-    color: '#00ff88',
-  },
-  explanationBox: {
-    backgroundColor: 'rgba(0, 212, 255, 0.06)',
-    borderRadius: 10,
-    padding: 12,
-  },
-  explanationText: {
-    fontSize: 12,
-    color: '#888',
-    lineHeight: 18,
-  },
-  securityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  securityDot: {
-    color: '#00ff88',
-    fontSize: 8,
-    marginRight: 10,
-    marginTop: 5,
-  },
-  securityText: {
-    fontSize: 14,
-    color: '#ccc',
-    flex: 1,
-    lineHeight: 20,
-  },
-  userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1e1e3a',
-  },
-  userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#00d4ff',
+  avatarBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
-  userAvatarText: {
-    color: '#0a0a1a',
-    fontSize: 18,
-    fontWeight: '700',
+  avatarText: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#000000',
   },
-  userInfo: {
+  logoutBtnIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#09090B',
+    borderWidth: 1,
+    borderColor: '#27272A',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingBottom: 60,
+  },
+  heroSection: {
+    paddingHorizontal: 24,
+    marginBottom: 40,
+  },
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  verifiedText: {
+    color: '#000000',
+    fontSize: 11,
+    fontWeight: '800',
+    marginLeft: 6,
+    letterSpacing: 0.5,
+  },
+  heroGreeting: {
+    fontSize: 40,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -1,
+    marginBottom: 4,
+  },
+  heroSub: {
+    fontSize: 15,
+    color: '#A1A1AA',
+  },
+  section: {
+    paddingHorizontal: 24,
+    marginBottom: 36,
+  },
+  carouselSection: {
+    marginBottom: 36,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#A1A1AA',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 16,
+  },
+  card: {
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#27272A',
+    backgroundColor: '#09090B',
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#27272A',
+  },
+  resultTextContainer: {
+    marginLeft: 16,
     flex: 1,
   },
-  userName: {
-    fontSize: 15,
-    color: '#ffffff',
-    fontWeight: '600',
+  resultMainText: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
   },
-  userEmail: {
+  resultSubText: {
     fontSize: 13,
-    color: '#888',
+    color: '#A1A1AA',
     marginTop: 2,
   },
-  emptyText: {
-    color: '#666',
-    fontSize: 14,
-    textAlign: 'center',
-    paddingVertical: 12,
+  errorText: {
+    color: '#EF4444',
   },
-  statusOk: {
-    color: '#00ff88',
+  tooltipBox: {
+    flexDirection: 'row',
+    marginTop: 12,
+    paddingHorizontal: 4,
   },
-  logoutButton: {
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
-    borderRadius: 14,
-    paddingVertical: 16,
+  tooltipIcon: {
+    marginRight: 6,
+    marginTop: 1,
+  },
+  tooltipText: {
+    fontSize: 12,
+    color: '#71717A',
+    flex: 1,
+    lineHeight: 18,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 107, 107, 0.2)',
   },
-  logoutButtonText: {
-    color: '#ff6b6b',
+  statBox: {
+    flex: 1,
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#27272A',
+    marginHorizontal: 16,
+  },
+  statLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#A1A1AA',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  securityGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  securityWidget: {
+    width: '47%',
+    backgroundColor: '#09090B',
+    borderWidth: 1,
+    borderColor: '#27272A',
+    borderRadius: 16,
+    padding: 16,
+    aspectRatio: 1,
+    justifyContent: 'space-between',
+  },
+  widgetIcon: {
+    alignSelf: 'flex-start',
+  },
+  widgetText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#E4E4E7',
+    lineHeight: 20,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#09090B',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#27272A',
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FFFFFF',
+    marginRight: 6,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  usersCarousel: {
+    paddingLeft: 24,
+    paddingRight: 8, // Less padding on right to account for card margin
+  },
+  userCard: {
+    width: 140,
+    backgroundColor: '#09090B',
+    borderWidth: 1,
+    borderColor: '#27272A',
+    borderRadius: 16,
+    padding: 16,
+    marginRight: 16,
+  },
+  userInitialsBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  userInitialsText: {
+    color: '#000000',
     fontSize: 16,
     fontWeight: '700',
+  },
+  userName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 12,
+    color: '#A1A1AA',
+  },
+  emptyText: {
+    color: '#A1A1AA',
+    fontSize: 13,
+    paddingHorizontal: 24,
   },
 });

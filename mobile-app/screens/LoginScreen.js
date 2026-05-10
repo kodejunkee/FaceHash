@@ -22,6 +22,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { loginUser } from '../services/api';
 import FaceCamera from '../components/FaceCamera';
 
@@ -97,8 +98,8 @@ export default function LoginScreen({ navigation }) {
       <View style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.lockIcon}>🔐</Text>
-          <Text style={styles.title}>Face Login</Text>
+          <Ionicons name="scan-outline" size={48} color="#FFFFFF" style={styles.icon} />
+          <Text style={styles.title}>FaceHash Auth</Text>
           <Text style={styles.subtitle}>
             Authenticate using your facial biometrics
           </Text>
@@ -106,7 +107,8 @@ export default function LoginScreen({ navigation }) {
 
         {/* Security badge */}
         <View style={styles.securityBadge}>
-          <Text style={styles.badgeText}>🛡️ AES-256 Encrypted Verification</Text>
+          <Ionicons name="shield-checkmark" size={16} color="#FFFFFF" />
+          <Text style={styles.badgeText}>AES-256 Encrypted Verification</Text>
         </View>
 
         {/* Email Input */}
@@ -115,11 +117,12 @@ export default function LoginScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Enter your registered email"
-            placeholderTextColor="#666"
+            placeholderTextColor="#71717A"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            selectionColor="#FFFFFF"
           />
         </View>
 
@@ -128,14 +131,18 @@ export default function LoginScreen({ navigation }) {
           style={[styles.loginButton, isLoading && styles.buttonDisabled]}
           onPress={startLogin}
           disabled={isLoading}
+          activeOpacity={0.8}
         >
           {isLoading ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator size="small" color="#0a0a1a" />
+              <ActivityIndicator size="small" color="#000000" />
               <Text style={styles.loginButtonText}>  Verifying...</Text>
             </View>
           ) : (
-            <Text style={styles.loginButtonText}>📸 Scan Face to Login</Text>
+            <View style={styles.btnRow}>
+              <Ionicons name="camera-outline" size={20} color="#000000" />
+              <Text style={styles.loginButtonText}>Scan Face to Login</Text>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -149,9 +156,10 @@ export default function LoginScreen({ navigation }) {
         <TouchableOpacity
           style={styles.registerLink}
           onPress={() => navigation.navigate('Register')}
+          activeOpacity={0.7}
         >
           <Text style={styles.registerLinkText}>
-            Don't have an account? Register
+            Don't have an account? <Text style={styles.registerLinkHighlight}>Register</Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -162,7 +170,7 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#000000',
   },
   content: {
     flex: 1,
@@ -171,79 +179,88 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 32,
   },
-  lockIcon: {
-    fontSize: 48,
+  icon: {
     marginBottom: 16,
   },
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#FFFFFF',
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#888',
+    fontSize: 15,
+    color: '#A1A1AA',
     textAlign: 'center',
   },
   securityBadge: {
-    backgroundColor: 'rgba(0, 255, 136, 0.08)',
-    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#09090B',
+    borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 16,
     alignSelf: 'center',
-    marginBottom: 30,
+    marginBottom: 32,
     borderWidth: 1,
-    borderColor: 'rgba(0, 255, 136, 0.15)',
+    borderColor: '#27272A',
   },
   badgeText: {
-    color: '#00ff88',
+    color: '#E4E4E7',
     fontSize: 13,
     fontWeight: '600',
+    marginLeft: 8,
   },
   form: {
-    marginBottom: 30,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#ccc',
+    color: '#E4E4E7',
     marginBottom: 8,
-    marginLeft: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   input: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
+    backgroundColor: '#09090B',
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 16,
     fontSize: 16,
-    color: '#ffffff',
+    color: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#27272A',
   },
   loginButton: {
-    backgroundColor: '#00d4ff',
-    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 16,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
+  },
+  btnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   loginButtonText: {
-    color: '#0a0a1a',
-    fontSize: 17,
+    color: '#000000',
+    fontSize: 16,
     fontWeight: '700',
+    marginLeft: 8,
   },
   loadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   loadingText: {
-    color: '#888',
+    color: '#71717A',
     fontSize: 13,
     textAlign: 'center',
     marginBottom: 16,
@@ -253,8 +270,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   registerLinkText: {
-    color: '#00d4ff',
-    fontSize: 15,
+    color: '#A1A1AA',
+    fontSize: 14,
     fontWeight: '500',
+  },
+  registerLinkHighlight: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });

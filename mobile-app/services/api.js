@@ -16,7 +16,7 @@ import axios from 'axios';
 // Change this to your backend server's IP address
 // Use your computer's local network IP (not localhost)
 // Find it with: ipconfig (Windows) or ifconfig (Mac/Linux)
-const API_BASE_URL = 'http://192.168.3.13:5000/api';
+const API_BASE_URL = 'http://10.186.14.13:5001/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

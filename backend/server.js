@@ -77,8 +77,8 @@ async function startServer() {
     // Start Express server on all network interfaces
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`✓ Server running locally on http://localhost:${PORT}`);
-      console.log(`✓ Server running on network at http://192.168.3.13:${PORT}`);
-      console.log(`✓ Health check: http://192.168.3.13:${PORT}/api/health`);
+      console.log(`✓ Server running on network at http://10.186.14.13:${PORT}`);
+      console.log(`✓ Health check: http://10.186.14.13:${PORT}/api/health`);
       console.log('─────────────────────────────────────────\n');
     });
   } catch (error) {

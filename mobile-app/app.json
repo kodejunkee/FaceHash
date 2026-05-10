@@ -23,8 +23,11 @@
         "backgroundColor": "#0a0a1a"
       },
       "permissions": [
-        "CAMERA"
-      ]
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.jaydeveloper.facehashapp"
     },
     "plugins": [
       [
@@ -33,6 +36,11 @@
           "cameraPermission": "This app requires camera access to capture your face for biometric authentication."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "71cdd7a2-6869-414f-9783-a6ad72647bb8"
+      }
+    }
   }
 }

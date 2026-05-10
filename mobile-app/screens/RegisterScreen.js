@@ -25,6 +25,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { registerUser } from '../services/api';
 import FaceCamera from '../components/FaceCamera';
 
@@ -121,10 +122,13 @@ export default function RegisterScreen({ navigation }) {
 
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>🔒 How it works</Text>
+          <View style={styles.infoTitleRow}>
+            <Ionicons name="information-circle-outline" size={18} color="#FFFFFF" style={styles.infoIcon} />
+            <Text style={styles.infoTitle}>How it works</Text>
+          </View>
           <Text style={styles.infoText}>
             Your face image is processed to generate a biometric template.
-            This template is encrypted using AES-256 encryption before being
+            This template is encrypted using AES-256 before being
             stored in our secure database. Your actual face image is never stored.
           </Text>
         </View>
@@ -135,21 +139,23 @@ export default function RegisterScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Enter your full name"
-            placeholderTextColor="#666"
+            placeholderTextColor="#71717A"
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
+            selectionColor="#FFFFFF"
           />
 
           <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter your email"
-            placeholderTextColor="#666"
+            placeholderTextColor="#71717A"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            selectionColor="#FFFFFF"
           />
         </View>
 
@@ -158,13 +164,17 @@ export default function RegisterScreen({ navigation }) {
           style={[styles.registerButton, isLoading && styles.buttonDisabled]}
           onPress={startCapture}
           disabled={isLoading}
+          activeOpacity={0.8}
         >
           {isLoading ? (
-            <ActivityIndicator size="small" color="#0a0a1a" />
+            <ActivityIndicator size="small" color="#000000" />
           ) : (
-            <Text style={styles.registerButtonText}>
-              📸 Capture Face & Register
-            </Text>
+            <View style={styles.btnRow}>
+              <Ionicons name="camera-outline" size={20} color="#000000" />
+              <Text style={styles.registerButtonText}>
+                Capture Face & Register
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -178,9 +188,10 @@ export default function RegisterScreen({ navigation }) {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
         >
           <Text style={styles.backButtonText}>
-            Already registered? Go to Login
+            Already registered? <Text style={styles.backButtonHighlight}>Go to Login</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -191,85 +202,99 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#000000',
   },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 80,
     paddingBottom: 40,
   },
   header: {
-    marginBottom: 30,
+    marginBottom: 32,
   },
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#FFFFFF',
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#888',
+    fontSize: 15,
+    color: '#A1A1AA',
     lineHeight: 22,
   },
   infoCard: {
-    backgroundColor: 'rgba(0, 212, 255, 0.08)',
-    borderRadius: 16,
+    backgroundColor: '#09090B',
+    borderRadius: 8,
     padding: 20,
-    marginBottom: 30,
+    marginBottom: 32,
     borderWidth: 1,
-    borderColor: 'rgba(0, 212, 255, 0.15)',
+    borderColor: '#27272A',
   },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#00d4ff',
+  infoTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  infoText: {
+  infoIcon: {
+    marginRight: 6,
+  },
+  infoTitle: {
     fontSize: 14,
-    color: '#aaa',
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  infoText: {
+    fontSize: 13,
+    color: '#A1A1AA',
     lineHeight: 20,
   },
   form: {
-    marginBottom: 30,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#ccc',
+    color: '#E4E4E7',
     marginBottom: 8,
-    marginLeft: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   input: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
+    backgroundColor: '#09090B',
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 16,
     fontSize: 16,
-    color: '#ffffff',
-    marginBottom: 20,
+    color: '#FFFFFF',
+    marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#27272A',
   },
   registerButton: {
-    backgroundColor: '#00d4ff',
-    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 16,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
+  },
+  btnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   registerButtonText: {
-    color: '#0a0a1a',
-    fontSize: 17,
+    color: '#000000',
+    fontSize: 16,
     fontWeight: '700',
+    marginLeft: 8,
   },
   loadingText: {
-    color: '#888',
+    color: '#71717A',
     fontSize: 13,
     textAlign: 'center',
     marginBottom: 16,
@@ -279,8 +304,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   backButtonText: {
-    color: '#00d4ff',
-    fontSize: 15,
+    color: '#A1A1AA',
+    fontSize: 14,
     fontWeight: '500',
+  },
+  backButtonHighlight: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });
