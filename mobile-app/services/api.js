@@ -13,10 +13,8 @@ import axios from 'axios';
 // ──────────────────────────────────────────────
 // CONFIGURATION
 // ──────────────────────────────────────────────
-// Change this to your backend server's IP address
-// Use your computer's local network IP (not localhost)
-// Find it with: ipconfig (Windows) or ifconfig (Mac/Linux)
-const API_BASE_URL = 'http://10.186.14.13:5001/api';
+// Production API — hosted on Railway
+const API_BASE_URL = 'https://facehash-production.up.railway.app/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
